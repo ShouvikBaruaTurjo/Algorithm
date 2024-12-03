@@ -1,0 +1,58 @@
+def convert_matrix_to_edges(adj_matrix):
+    edges = []
+    n = len(adj_matrix)
+    for i in range(n):
+        for j in range(i + 1, n):
+            if adj_matrix[i][j] != 0:  # There's an edge
+                edges.append((i, j, adj_matrix[i][j]))
+    return edges
+
+def find_component(components, node):
+    # Find the component that contains the node
+    for comp in components:
+        if node in comp:
+            return comp
+    return None
+
+def kruskal(adj_matrix):
+    n = len(adj_matrix)
+    edges = convert_matrix_to_edges(adj_matrix)
+    
+    # Step 2: Sort edges by weight
+    edges.sort(key=lambda x: x[2])  # Sort by weight (x[2] is the weight)
+
+    # Step 3: Initialize the list of components (each node is initially in its own component)
+    components = [[i] for i in range(n)]
+
+    mst = []  # To store the edges of the Minimum Spanning Tree
+
+    # Step 4: Process each edge
+    for u, v, weight in edges:
+        # Find the components of u and v
+        comp_u = find_component(components, u)
+        comp_v = find_component(components, v)
+
+        # If u and v are in different components, add the edge to the MST and merge the components
+        if comp_u != comp_v:
+            mst.append((u, v, weight))
+            # Merge the two components
+            comp_u.extend(comp_v)
+            components.remove(comp_v)
+
+    return mst
+
+# Example adjacency matrix (undirected graph)
+adj_matrix = [
+    [0, 1, 0, 0, 0, 4],
+    [1, 0, 2, 3, 0, 0],
+    [0, 2, 0, 5, 0, 0],
+    [0, 3, 5, 0, 6, 0],
+    [0, 0, 0, 6, 0, 7],
+    [4, 0, 0, 0, 7, 0]
+]
+
+# Find the MST using Kruskal's algorithm without Disjoint Set
+mst = kruskal(adj_matrix)
+print("Edges in the MST:")
+for u, v, weight in mst:
+    print(f"({u}, {v}) with weight {weight}")
